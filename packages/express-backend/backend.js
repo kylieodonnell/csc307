@@ -43,15 +43,10 @@ const users = {
     ]
  }
 
-
- app.get('/users', (req, res) => {
-   res.send(users);
-});
-
 const findUserById = (id) =>
     users['users_list']
         .find( (user) => user['id'] === id);
-    
+
 app.get('/users/:id', (req, res) => {
     const id = req.params['id']; //or req.params.id
     let result = findUserById(id);
@@ -62,6 +57,41 @@ app.get('/users/:id', (req, res) => {
     }
 });
 
+const findUsersByNameAndJob = (name, job) => 
+    users['users_list'].filter((user) => user.name === name && user.job === job);
+
+const findUserByJob = (job) =>
+   users['users_list'].filter((user) => user.job === job);
+
+const findUserByName = (name) =>
+   users['users_list'].filter((user) => user.name === name);
+
+app.get('/users', (req, res) => {
+    const { name, job } = req.query;
+    if (name && job) {
+        const results = findUsersByNameAndJob(name, job);
+        if (results.length === 0) {
+            return res.status(404).send('no users found w/ the name and job');
+        }
+        return res.send(results);
+    } else if (name) {
+        const results = findUserByName(name);
+        if (results.length === 0) {
+            return res.status(404).send('no users found w/ name.');
+        }
+        return res.send(results);
+    } else if (job) {
+        const results = findUserByJob(job);
+        if (results.length === 0) {
+            return res.status(404).send('no users found w/ job.');
+        }
+        return res.send(results);
+    } else {
+        return res.send(users);
+    }
+});
+
+  
 const addUser = (user) => {
    users['users_list'].push(user);
    return user;
