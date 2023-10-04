@@ -43,6 +43,11 @@ const users = {
     ]
  }
 
+
+ app.get('/users', (req, res) => {
+   res.send(users);
+});
+
 const findUserById = (id) =>
     users['users_list']
         .find( (user) => user['id'] === id);
@@ -55,4 +60,33 @@ app.get('/users/:id', (req, res) => {
     } else {
         res.send(result);
     }
+});
+
+const addUser = (user) => {
+   users['users_list'].push(user);
+   return user;
+}
+
+app.post('/users', (req, res) => {
+   const userToAdd = req.body;
+   addUser(userToAdd);
+   res.send();
+});
+
+const deleteUser = (userId) => {
+   const index = users['users_list'].findIndex((user) => user.id === userId);
+   if (index > -1) {
+     users['users_list'].splice(index, 1);
+   }
+};
+
+app.delete('/users/:id', (req, res) => {
+   const id = req.params['id'];
+   const user = findUserById(id);
+   if (user === undefined) {
+       res.send('Resource not found.');
+   } else {
+      deleteUser(id);
+      res.send(user);
+   }
 });
