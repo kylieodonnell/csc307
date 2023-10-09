@@ -94,16 +94,21 @@ app.get('/users', (req, res) => {
     }
 });
 
+function idGenerator() {
+    return Math.random().toString(36).substr(2, 9);
+}
+
   
 const addUser = (user) => {
+   user.id = idGenerator();
    users['users_list'].push(user);
    return user;
 }
 
 app.post('/users', (req, res) => {
    const userToAdd = req.body;
-   addUser(userToAdd);
-   res.send();
+   const newUser = addUser(userToAdd)
+   res.status(201).send(newUser); // returning the right code 201 & updated object
 });
 
 const deleteUser = (userId) => {
@@ -120,6 +125,6 @@ app.delete('/users/:id', (req, res) => {
        res.send('Resource not found.');
    } else {
       deleteUser(id);
-      res.send(user);
+      res.status(204).send();
    }
 });
